@@ -11,7 +11,19 @@ module.exports = () => {
 
     // 세션에 저장한 아이디를 통해 사용자 정보 객체를 불러오는 것
     passport.deserializeUser((id, done) => { // 매 요청시마다 실행, done의 두 번째 인수로 넣었던 데이터가 이 함수의 매개변수가 된다.
-       User.findOne({ where: { id }})
+        // 라우터가 실행되기 전에 deserializeUser 가 실행되므로 해당부분을 캐싱해두면 부담을 덜 수 있다. 그러나 캐싱이 유지되는 동안 팔로워/팔로잉 정보가 갱신되지 않는 부분은 처리해야한다.
+       User.findOne({
+            where: { id },
+            include: [{
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followers',
+            }, {
+            model: User,
+            attributes: ['id', 'nick'],
+            as: 'Followings',
+            }],
+       })
            .then(user => done(null, user))
            .catch(err => done(err));
     });
