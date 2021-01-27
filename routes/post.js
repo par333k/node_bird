@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const { Post, Hashtag } = require('../models');
+const { Post, Hashtag, User } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
@@ -57,6 +57,29 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
         console.error(error);
         next(error);
     }
+});
+
+// 좋아요
+router.post('/:id/like', isLoggedIn, async (req, res, next) => {
+   try {
+       const post = await Post.findOne({ where: { id: req.params.id }});
+       // user 모델과 post 모델간 N:M 관계 모델에 설정
+       // add 메서드로 post모델의 as인 Post를 넣어서 through로 생성된 likepost에 게시글 등록
+       // postId는 왜래키로 넘기기 때문에 post.addPost를 사용할 경우 userId가 파라미터가 됨
+       const like = await post.addPost(parseInt(req.user.id, 10));
+       console.log(like);
+      // const like = await user.addLikepost(parseInt(req.params.id, 10));
+
+       /*if (user) {
+           await user.addPost(parseInt(req.params.id, 10));
+           res.send('success');
+       } else {
+           res.status(404).send('no post');
+       }*/
+   } catch(error) {
+       console.error(error);
+       next(error);
+   }
 });
 
 module.exports = router;

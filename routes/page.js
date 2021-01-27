@@ -8,11 +8,13 @@ router.use((req, res, next) => {
     res.locals.user = req.user;
     res.locals.followerCount = req.user ? req.user.Followers.length : 0;
     res.locals.followingCount = req.user ? req.user.Followings.length : 0;
-    res.locals.followerIdList = req.user ? req.user.Followings.map(f => f.id) : [];
+    res.locals.followerIdList = req.user ? req.user.Followers.map(f => f.id) : [];
+    res.locals.followingIdList = req.user ? req.user.Followings.map(f => f.id) : [];
     next();
 });
 
 router.get('/profile', isLoggedIn, (req, res) => {
+    console.log(res);
     res.render('profile', { title: '내 정보 - NodeBird' });
 });
 
@@ -29,6 +31,7 @@ router.get('/', async (req, res, next) => {
             },
            order: [['createdAt', 'DESC']]
        });
+       console.log(posts);
        res.render('main', {
            title: 'NodeBird',
            twits: posts,

@@ -6,7 +6,7 @@
         <h2>팔로잉 목록</h2>
         {% if user.Followings %}
         {% for following in user.Followings %}
-        <div>{{following.nick}}</div>
+        <div>{{following.nick}} <button class="follow-cancel" data-src="{{following.id}}" data-user="{{user.id}}">팔로우 취소</button></div>
         {% endfor %}
         {% endif %}
     </div>
@@ -14,9 +14,30 @@
         <h2>팔로워 목록</h2>
         {% if user.Followers %}
         {% for follower in user.Followers %}
-        <div>{{follower.nick}}</div>
+        <div datasrc="{{user.id}}">{{follower.nick}}</div>
         {% endfor %}
         {% endif %}
     </div>
 </div>
+{% endblock %}
+{% block script %}
+<script>
+document.querySelectorAll('.follow-cancel').forEach(function (tag) {
+    tag.addEventListener('click', function () {
+        console.log(tag.dataset.src); // 3
+        const followingId = tag.dataset.src;
+        if (followingId) {
+            if (confirm('팔로우를 취소하시겠습니까?')) {
+                axios.delete(`/user/${followingId}/follow`)
+                    .then(() => {
+                        location.reload();
+                    })
+                .catch((err) => {
+                    console.error(err);
+                });
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
