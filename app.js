@@ -71,10 +71,7 @@ app.use((err, req, res, next) => {
     res.render('error');
 });
 
-app.listen(app.get('port'), () => {
-    console.log(app.get('port'), '번 포트에서 대기중');
-});
-
+module.exports = app;
 /*
 * 팔로잉 끊기 - 구현 완료
 * 프로필정보수정 - 정보자체가 없다 임마
