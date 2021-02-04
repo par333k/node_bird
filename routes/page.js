@@ -25,16 +25,27 @@ router.get('/join', isNotLoggedIn, (req, res) => {
 router.get('/', async (req, res, next) => {
    try {
        const posts = await Post.findAll({
-            include: {
+            include: [{ // 작성자
               model: User,
               attributes: ['id', 'nick'],
-            },
+            }, { // 좋아요 누른 사람들
+              model: User,
+              attributes: ['id', 'nick'],
+              as: 'Liker',
+            }],
            order: [['createdAt', 'DESC']]
        });
-       console.log(posts);
+       let like = [];
+       for (let i = 0; i < posts.length; i++) {
+           like.push(posts[i].Liker.map(l => l.id));
+       };
+
+       like = like.flat(Infinity);
+       console.log(like);
        res.render('main', {
            title: 'NodeBird',
            twits: posts,
+           likes: like,
        });
    } catch (err) {
        console.error(err);

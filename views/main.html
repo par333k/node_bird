@@ -33,7 +33,12 @@
             {% if not followingIdList.includes(twit.User.id) and twit.User.id !== user.id %}
             <button class="twit-follow">팔로우하기</button>
             {% endif %}
+            {% if not likes.includes(user.id) and twit.User.id !== user.id %}
             <button class="twit-like">좋아요</button>
+            {% endif %}
+            {% if likes.includes(user.id) and twit.User.id !== user.id %}
+            <button class="twit-unlike">좋아요 취소</button>
+            {% endif %}
             <div class="twit-content">{{twit.content}}</div>
             {% if twit.img %}
             <div class="twit-img"><img src="{{twit.img}}" alt="섬네일"></div>
@@ -96,6 +101,22 @@
                 }
             }
         })
-    })
+    });
+    document.querySelectorAll('.twit-unlike').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+            const postId = tag.parentNode.querySelector('.twit-id').value;
+            if (postId) {
+                if (confirm('좋아요를 취소하시겠습니까?')) {
+                    axios.delete(`/post/${postId}/like`)
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+                }
+            }
+        })
+    });
 </script>
 {% endblock %}

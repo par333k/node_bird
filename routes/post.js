@@ -58,16 +58,33 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
         next(error);
     }
 });
+// 좋아요 취소
+router.delete('/:id/like', isLoggedIn, async (req, res, next) => {
+    try {
+        const post = await Post.findOne({ where: { id: req.params.id }});
+        console.log(post);
+        // user 모델과 post 모델간 N:M 관계 모델에 설정
+        // remove 메서드로 post모델의 as인 Likepost를 넣어서 through로 생성된 컬럼을 likepost에서 삭제
+        // postId는 왜래키로 넘기기 때문에 post.addLikepost를 사용할 경우 userId가 파라미터가 됨
+        await post.removeLiker(parseInt(req.user.id, 10));
+        res.redirect('/');
+    } catch(error) {
+        console.error(error);
+        next(error);
+    }
+});
 
 // 좋아요
 router.post('/:id/like', isLoggedIn, async (req, res, next) => {
    try {
        const post = await Post.findOne({ where: { id: req.params.id }});
+
+       console.log(post);
        // user 모델과 post 모델간 N:M 관계 모델에 설정
-       // add 메서드로 post모델의 as인 Post를 넣어서 through로 생성된 likepost에 게시글 등록
+       // add 메서드로 post모델의 as인 Post를 넣어서 through로 생성된 likepost에 컬럼 등록
        // postId는 왜래키로 넘기기 때문에 post.addPost를 사용할 경우 userId가 파라미터가 됨
-       const like = await post.addPost(parseInt(req.user.id, 10));
-       console.log(like);
+       await post.addLiker(parseInt(req.user.id, 10));
+ //      console.log(like);
       // const like = await user.addLikepost(parseInt(req.params.id, 10));
 
        /*if (user) {
@@ -81,5 +98,6 @@ router.post('/:id/like', isLoggedIn, async (req, res, next) => {
        next(error);
    }
 });
+
 
 module.exports = router;
