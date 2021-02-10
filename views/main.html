@@ -30,6 +30,9 @@
             <input type="hidden" value="{{twit.User.id}}" class="twit-user-id">
             <input type="hidden" value="{{twit.id}}" class="twit-id">
             <div class="twit-author">{{twit.User.nick}}</div>
+            {% if twit.User.id === user.id %}
+            <button class="twit-delete">글삭제</button>
+            {% endif %}
             {% if not followingIdList.includes(twit.User.id) and twit.User.id !== user.id %}
             <button class="twit-follow">팔로우하기</button>
             {% endif %}
@@ -108,6 +111,22 @@
             if (postId) {
                 if (confirm('좋아요를 취소하시겠습니까?')) {
                     axios.delete(`/post/${postId}/like`)
+                        .then(() => {
+                            location.reload();
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+                }
+            }
+        })
+    });
+    document.querySelectorAll('.twit-delete').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+            const postId = tag.parentNode.querySelector('.twit-id').value;
+            if (postId) {
+                if (confirm('글을 삭제하시겠습니까?')) {
+                    axios.delete(`/post/${postId}`)
                         .then(() => {
                             location.reload();
                         })

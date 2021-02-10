@@ -99,5 +99,15 @@ router.post('/:id/like', isLoggedIn, async (req, res, next) => {
    }
 });
 
+// 포스트 삭제
+router.delete('/:id', isLoggedIn, async (req, res, next) => {
+    try {
+        await Post.destroy({ where: { id: req.params.id }});
+        res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+})
 
 module.exports = router;
